@@ -6,7 +6,7 @@ use Hrmpfz\PayBySquare\Payment;
 use Hrmpfz\PayBySquare\Encoder;
 use chillerlan\QRCode\{QRCode, QROptions};
 use chillerlan\QRCode\Common\EccLevel;
-use chillerlan\QRCode\Output\{QRGdImage, QRMarkupSVG};
+use chillerlan\QRCode\Output\QROutputInterface;
 use RuntimeException;
 
 /**
@@ -29,7 +29,7 @@ class Renderer
         $options = new QROptions([
             'version' => QRCode::VERSION_AUTO,
             'eccLevel' => EccLevel::L,
-            'outputInterface' => QRGdImage::class,
+            'outputType' => QROutputInterface::GDIMAGE_PNG,
             'scale' => 6,
             'imageBase64' => false,
         ]);
@@ -52,7 +52,7 @@ class Renderer
         $options = new QROptions([
             'version' => QRCode::VERSION_AUTO,
             'eccLevel' => EccLevel::L,
-            'outputInterface' => QRMarkupSVG::class,
+            'outputType' => QROutputInterface::MARKUP_SVG,
             'outputBase64' => false,
         ]);
 
