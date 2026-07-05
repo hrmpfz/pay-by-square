@@ -1,0 +1,81 @@
+# pure-PHP PAY by square QR Payload Generator
+
+A lightweight, Composer-compatible PHP library to generate Slovak **PAY by square** payment QR code payloads. 
+
+### Why this library?
+Most existing PHP libraries for PAY by square depend on the external `xz` system binary or PECL extensions to perform the LZMA compression required by the standard. This makes them incompatible with cheap, shared, FTP-only hosting where shell execution functions (`exec`, `shell_exec`, `proc_open`) and custom C extensions are disabled.
+
+This library features a **100% pure-PHP implementation of the LZMA range encoder**, requiring zero external binaries or system extensions beyond common PHP core features.
+
+---
+
+## Features
+
+- **Zero dependencies on external binaries** (no `xz`, `7z` or similar CLI tools needed).
+- **Safe for shared FTP hosting**: Does not use `exec`, `proc_open`, FFI, or PECL extensions.
+- **Fluent Payment Data API** (IBAN, BIC, amount, variable symbol, constant symbol, specific symbol, payment note/message, due date, beneficiary details).
+- **Automatic deburring**: Removes Slovak diacritics automatically to ensure compatibility with older banking apps.
+- **QR Code generation**: Simple rendering to SVG or PNG out-of-the-box using `chillerlan/php-qrcode`.
+
+---
+
+## Installation
+
+Add the library to your project using Composer:
+
+```bash
+composer require "hrmpfz/pay-by-square"
+```
+
+---
+
+## Usage
+
+```php
+use Hrmpfz\PayBySquare\Payment;
+use Hrmpfz\PayBySquare\PayBySquare;
+
+// 1. Create and configure your payment order
+$payment = Payment::create()
+    ->iban('SK0000000000000000000000')
+    ->bic('BANKSKBX')
+    ->amount('49.00')
+    ->currency('EUR')
+    ->variableSymbol('202600123')
+    ->message('Stvrtok o siestej - registracia')
+    ->dueDate(new DateTimeImmutable('2026-07-13'));
+
+// 2. Generate the raw PAY by square payload (Base32Hex format)
+$payload = PayBySquare::encode($payment);
+echo "PAY by square string: " . $payload . "\n";
+
+// 3. Render directly to files
+// Render SVG QR code:
+PayBySquare::svg($payment, __DIR__ . '/payment.svg');
+
+// Render PNG QR code (requires the PHP GD extension):
+PayBySquare::png($payment, __DIR__ . '/payment.png');
+```
+
+---
+
+## FTP Shared Hosting Deployment
+
+To deploy this library to shared hosting:
+
+1. Install it locally or in your CI/CD pipeline using Composer:
+   ```bash
+   composer install --no-dev
+   ```
+2. Upload the entire project directory including the `vendor/` folder to your shared FTP hosting.
+3. Call the library in your code as shown above. No special configuration or system-level setups are required!
+
+---
+
+## How It Works Under the Hood
+
+The PAY by square standard adopts the LZMA1 compression format (with parameters `lc=3`, `lp=0`, `pb=2`).
+To keep the PHP library simple and avoid porting the complex LZ77 match-finding algorithms of the LZMA SDK, this library implements a **literal-only LZMA range encoder**:
+1. All characters are encoded as literal symbols within the LZMA range coder.
+2. The resulting compressed stream is only about ~14 bytes larger than one compressed with match-finding, meaning a typical invoice payload compresses to ~105 bytes.
+3. This is well within the QR code capacity limits (max 550 characters) and is 100% compliant with standard decoders used by Slovak banks.
