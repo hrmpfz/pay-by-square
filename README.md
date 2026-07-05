@@ -42,7 +42,7 @@ $payment = Payment::create()
     ->amount('49.00')
     ->currency('EUR')
     ->variableSymbol('202600123')
-    ->message('Stvrtok o siestej - registracia')
+    ->message('Registracny poplatok')
     ->dueDate(new DateTimeImmutable('2026-07-13'));
 
 // 2. Generate the raw PAY by square payload (Base32Hex format)
