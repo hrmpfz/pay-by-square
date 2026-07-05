@@ -1,0 +1,11 @@
+/vendor/
+/.ddev/
+/docs/
+/scratch_npm/
+/composer.lock
+/examples/payment.png
+/examples/payment.svg
+.idea/
+.vscode/
+.DS_Store
+*.local
