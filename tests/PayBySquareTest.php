@@ -19,12 +19,12 @@ class PayBySquareTest extends TestCase
             ->amount('49.00')
             ->currency('EUR')
             ->variableSymbol('202600123')
-            ->message('Stvrtok o siestej - registracia')
+            ->message('registracny poplatok')
             ->dueDate(new \DateTimeImmutable('2026-07-13'));
 
         $payload = PayBySquare::encode($payment);
         
-        $expected = "08070000D4E9N0EG9319N3I09Q1KQBVD6FA4302GPAREQJFPCELV83U6NGT1H30Q7ECOLAIOCIS55RACHH8DCK21HBQMC0QO0EF88PFRPAUCUC4L8O3E62MC4AI0KOIALRJAVLOALBA69CMV0D9VVVIDCU00";
+        $expected = "0806A0006GD1KBO092Q7FAVOUC0SKTSPSCECNQ1NFN3J9GEVFOP9O4A61QR0LV8BSD38GRVLG6BQ1HPEHNSCUR59HET1HNG50EQ29GQNAHO3Q77S8MR63KH37206QIIBRPQQE9SNBSEKTPQGO27O93IF5ELNG";
         
         $this->assertEquals($expected, $payload);
     }
